@@ -1,17 +1,7 @@
 import React, { Component } from 'react';
-// import {
-//   Button,
-//   Panel,
-//   Grid,
-//   Row,
-//   Col,
-//   Glyphicon
-// } from 'react-bootstrap';
-// import ReactDOM from 'react-dom';
 import { w3cwebsocket as Ws } from "websocket";
 import axios from 'axios'
 import config from '../../config.js'
-// import LinkTableData from './component/LinkTableData'
 import './style/HomeStyle.css'
 
 // const extraHeaders = {
@@ -46,7 +36,6 @@ class HomeComponent extends Component {
   }
 
   componentDidMount() {
-    localStorage.setItem('token', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJVamFuZyIsImlhdCI6MTU4MTE1NDgxOSwiZXhwIjoxNTgzNzQ2ODE5fQ.vfhuNGPjlN1eTCyDSyVCdnx8-E3QZDmPt8lQAHEmTTE")
     this.getLinkDatas()
   }
   
@@ -91,37 +80,53 @@ class HomeComponent extends Component {
   }
 
   like = (vote, content_id) => {
-    console.log(`vote`, vote)
     let data = this.state.contents
-    console.log(`data`, data)
-
-    // data.map((val, idx) => {
-    //   if (val.id  === content_id) {
-    //     val.likers += this.state.vote
-    //   }
-    // })
-    // this.setState({
-    //   vote: 0
-    // })
-    console.log(`data update`, data)
-    // this.setState({
-    //   like: this.state.vote,
-    //   vote: 0,
-    //   dislike: 0,
-    // })
+    data.map((val, idx) => {
+      if (val.id  === content_id) {
+        if (this.state.like < 1) {
+          val.likers += this.state.vote
+          this.setState({
+            vote: 0,
+            like: 1,
+            dislike: 0,
+            contents: data
+          })
+        } else {
+          val.likers -= this.state.like
+          this.setState({
+            vote: 1,
+            like: 0,
+            dislike: 0,
+            contents: data
+          })
+        }
+      }
+    })
   }
 
   dislike = (vote, content_id) => {
-    console.log(`vote`, vote)
     let data = this.state.contents
-    console.log(`data`, data)
-    
-    // this.setState({
-    //   contents: data,
-    //   like: this.state.vote,
-    //   vote: 0,
-    //   dislike: 0,
-    // })
+    data.map((val, idx) => {
+      if (val.id  === content_id) {
+        if (this.state.dislike < 1) {
+          val.dislikers += this.state.vote
+          this.setState({
+            vote: 0,
+            dislike: 1,
+            like: 0,
+            contents: data
+          })
+        } else {
+          val.dislikers -= this.state.dislike
+          this.setState({
+            vote: 1,
+            dislike: 0,
+            like: 0,
+            contents: data
+          })
+        }
+      }
+    })
   }
 
   renderCommend = (comments) => {
@@ -129,9 +134,9 @@ class HomeComponent extends Component {
       comments.map((item, index) => {
         return (
           <div key={index} className="text-left">
-            <div>{item.username}</div>
-            <div>{item.comment}</div>
-            <div>{item.created_date}</div>
+            <div className="user_commend">{item.username}</div>
+            <div className="item_commend">{item.comment}</div>
+            <div className="date_commend">{item.created_date}</div>
           </div>
         )
       })
