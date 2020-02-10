@@ -1,13 +1,50 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, Switch, Link, Redirect } from 'react-router-dom';
 import './App.css';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import Home from './routes/Home';
-import LoginAuth from './routes/LoginAuth';
+import AuthRoute from './routes/LoginAuth';
 
 class App extends Component {
-  render() {
+  componentDidMount() {
+    this.authLogin()
+  }
+
+  isLogin = () => {
+    
+  }
+
+  authLogin = () => {
+    if (localStorage.getItem('token')) {
+      this.renderApp()
+    }
+  }
+  
+  renderLogin() {
     return (
-    <Router>
+      <div className="container">
+        <div className="d-flex justify-content-between">
+          <div className="head-page">
+            Welcome to Youtube Clone
+          </div>
+          <div className="head-page2">
+            Widen your insight
+          </div>
+        </div>
+        <hr/>
+        <AuthRoute/>
+      </div>
+    )
+  }
+
+  logout = () => {
+    localStorage.removeItem('token')
+    window.location.reload();
+    this.renderLogin()
+  }
+
+  renderApp() {
+    return (
+      <Router>
         <div className="container">
           <div className="d-flex justify-content-between">
             <div className="head-page">
@@ -32,17 +69,33 @@ class App extends Component {
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
               <ul className="navbar-nav mr-auto">
                 <li className="nav-item"><Link to={'/'} className="nav-link"> Home </Link></li>
-                <li className="nav-item"><Link to={'/auth'} className="nav-link">Login</Link></li>
+                <li className="nav-item"><a href="/#" className="nav-link" onClick={this.logout}>Logout</a></li>
+                {/* <li className="nav-item"><Link to={'/auth'} className="nav-link">Logout</Link></li> */}
               </ul>
             </div>
-           </nav>
-           <hr />
+          </nav>
+          <hr />
           <Switch>
               <Route exact path='/' component={Home} />
-              <Route exact path='/auth' component={LoginAuth} />
+              <Route exact path='/auth' component={AuthRoute} />
+              <Redirect from='*' to='/' />
           </Switch>
         </div>
       </Router>
+    )
+  }
+
+  render() {
+    return (
+      <div>
+        {
+          localStorage.getItem('token')
+          // ? this.renderLogin()
+          // : this.renderApp()
+          ? this.renderApp()
+          : this.renderLogin()
+        }
+      </div>
     );
   }
 }

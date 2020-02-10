@@ -8,46 +8,41 @@ import React, { Component } from 'react';
 //   Glyphicon
 // } from 'react-bootstrap';
 // import ReactDOM from 'react-dom';
-import { w3cwebsocket as Ws } from "websocket";
 import axios from 'axios'
 import config from '../../config.js'
 // import LinkTableData from './component/LinkTableData'
 import './style/HomeStyle.css'
-
-// const extraHeaders = {
-//     Authorization: localStorage.getItem('token')
-// }
-// const client = new Ws('ws:https://bagidata.com:3030/video', {
-//   protocolVersion: 8,
-//   rejectUnauthorized: false 
-//   }
-// );
-
-// const webSocketsServerPort = 8000;
-// const webSocketServer = require('websocket').server;
-// const http = require('http');
-// const server = http.createServer();
-// server.listen(webSocketsServerPort);
-// const wsServer = new webSocketServer({
-//   httpServer: server
-// });
 
 class HomeComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
       date: new Date(),
+      contents: [],
+      link: {
+        longUrl: '',
+      },
       isTyping: false,
-      vote: 1,
-      like: 0,
-      dislike: 0,
-      contents: []
     };
   }
 
   componentDidMount() {
     localStorage.setItem('token', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJVamFuZyIsImlhdCI6MTU4MTE1NDgxOSwiZXhwIjoxNTgzNzQ2ODE5fQ.vfhuNGPjlN1eTCyDSyVCdnx8-E3QZDmPt8lQAHEmTTE")
     this.getLinkDatas()
+  }
+
+  handleChange = (event) => {
+    this.setState({
+      link: {
+        longUrl: event.target.value 
+      },
+      isTyping: true
+    })
+    if (event.target.value === '') {
+      this.setState({
+        isTyping: false
+      })
+    }
   }
   
   getLinkDatas = async () => {
@@ -62,11 +57,50 @@ class HomeComponent extends Component {
         this.setState({
           contents: res.data.data
         })
-        console.log(`this.state.contents`, this.state.contents)
       })
       .catch((err) => {
         alert(err.message)
       })
+  }
+
+  handleAddLink = (val) => {
+    val.preventDefault();
+    this.setState({
+      link: {
+        longUrl: ''
+      }
+    });
+    axios({
+      method: 'POST',
+      url: `${config.port}/link`,
+      data: this.state.link,
+    })
+      .then((res) => {
+        this.getLinkDatas()
+        this.setState({
+          link: {
+            longUrl: ""
+          },
+          isTyping: false
+        })
+      })
+      .catch((err) => {
+        // alert(err.message)
+        alert(`There is something wrong, please insert the url or use the right url "http://.." not "www" and check your network`)
+      })
+  }
+
+  removeAllLinks = () => {
+      axios({
+        method: `DELETE`,
+        url: `${config.port}/link`,
+      })
+        .then((value) => {
+          this.getLinkDatas()
+        })
+        .catch((err) => {
+          alert(err.message)
+        })
   }
 
   copyToClipboard(val) {
@@ -90,72 +124,14 @@ class HomeComponent extends Component {
     window.getSelection().removeAllRanges()
   }
 
-  like = (vote, content_id) => {
-    console.log(`vote`, vote)
-    let data = this.state.contents
-    console.log(`data`, data)
-
-    // data.map((val, idx) => {
-    //   if (val.id  === content_id) {
-    //     val.likers += this.state.vote
-    //   }
-    // })
-    // this.setState({
-    //   vote: 0
-    // })
-    console.log(`data update`, data)
-    // this.setState({
-    //   like: this.state.vote,
-    //   vote: 0,
-    //   dislike: 0,
-    // })
-  }
-
-  dislike = (vote, content_id) => {
-    console.log(`vote`, vote)
-    let data = this.state.contents
-    console.log(`data`, data)
-    
-    // this.setState({
-    //   contents: data,
-    //   like: this.state.vote,
-    //   vote: 0,
-    //   dislike: 0,
-    // })
-  }
-
-  renderCommend = (comments) => {
-    return (
-      comments.map((item, index) => {
-        return (
-          <div key={index} className="text-left">
-            <div>{item.username}</div>
-            <div>{item.comment}</div>
-            <div>{item.created_date}</div>
-          </div>
-        )
-      })
-    )
-  }
-
   renderListItem = () => {
     return (
       this.state.contents.map((item, index) => {
         return (
-          <div key={index} className="content-area">
+          <div key={index}>
             <div className="col-sm-4">
+              {/* <img id="img" class="style-scope yt-img-shadow" alt="" width="9999" src="https://i.ytimg.com/vi/LvNJC7Nj8mw/hq720.jpg?sqp=-oaymwEZCOgCEMoBSFXyq4qpAwsIARUAAIhCGAFwAQ==&amp;rs=AOn4CLC4t1AkZ8TMw640p8fwcAezwQg1hw"/> */}
               <iframe className="video-content" src={item.media_url} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-              <div className="title-video">{item.title}</div>
-              <div className="description-video">{item.description}</div>
-              <div className="text-right">
-                <div className="likers-video fa fa-thumbs-up" onClick={() => this.like(item.likers, item.id)}>{item.likers}</div>
-                <div className="dislikers-video fa fa-thumbs-down" onClick={() => this.dislike(item.dislikers, item.id)}>{item.dislikers}</div>
-              </div>
-              { 
-                0 < item.comments.length
-                ? this.renderCommend(item.comments)
-                : null
-              }
             </div>
           </div>
         )
@@ -164,15 +140,14 @@ class HomeComponent extends Component {
   }
 
   render() {
-    // client.onopen = () => {
-    //   console.log('WebSocket Client Connected');
-    // };
-    // client.onmessage = (message) => {
-    //   console.log(message);
-    // };
+    var ws = new WebSocket("https://bagidata.com:3030/video");
+
+    ws.onopen = function() {
+        console.log("Koneksi berhasil!");
+    };
     return (
       <div className="container">
-        <div className="banner-video">
+        {/* <div className="banner-video">
           <div className="embed-responsive embed-responsive-21by9">
             <iframe className="embed-responsive-item" src="https://www.youtube.com/embed/xoC27xAG0-s"></iframe>
           </div>
@@ -183,7 +158,7 @@ class HomeComponent extends Component {
             ? this.renderListItem()
             : null
           }
-        </div>
+        </div> */}
       </div>
     );
   }
