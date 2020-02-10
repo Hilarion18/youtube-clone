@@ -1,0 +1,73 @@
+.banner-video {
+  padding: 0px 15px 20px 15px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.row > div[class*='col-'] {
+ display: flex;
+}
+
+.content_area {
+  border: 10px;
+  border-color: black;
+}
+.col-sm-4 {
+  /* padding: 10px 5px 10px 5px; */
+  max-width: 23rem;
+}
+
+.video-content {
+  width: 22rem;
+  height: 12rem;
+}
+
+.title-video {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.description-video {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  text-align: left;
+}
+
+.likers-video {
+  text-align: right;
+  margin: 0px 10px 0px 10px;
+}
+
+.dislikers-video {
+  text-align: right;
+  margin: 0px 10px 0px 10px;
+}
+
+.fa {
+  font-size: 30px;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 20px;
+  color: rgb(29, 122, 243)
+}
+
+.fa:hover {
+  color: darkblue;
+}
+
+.user_commend {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: bold
+}
+
+.item_commend {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.date_commend {
+  font-family: monospace;
+}
